@@ -16,7 +16,7 @@ public class App extends Application {
 //Se crea un socket que apunta a la ruta que se muestra
         try {
 //            mSocket = IO.socket("http://wiltestchat123.eu-4.evennode.com/");
-            mSocket = IO.socket("http://rogerccesistaxi.eu-4.evennode.com//");
+            mSocket = IO.socket("http://rogerccesistaxi.eu-4.evennode.com/");
         }
         catch (Exception e){
         }
