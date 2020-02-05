@@ -35,4 +35,5 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 
+    implementation 'com.karumi:dexter:5.0.0'
 }

@@ -13,10 +13,14 @@
         android:layout_weight="90"
         class="com.google.android.gms.maps.SupportMapFragment"/>
     <Button
+
+        android:id="@+id/btn_pedir_taxi"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="10"
         android:text="Pedir Taxi"
         android:onClick="pedir"
+
+        android:enabled="false"
         />
 </LinearLayout>
