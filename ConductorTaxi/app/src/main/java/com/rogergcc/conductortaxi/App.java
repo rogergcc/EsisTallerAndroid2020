@@ -24,4 +24,12 @@ public class App extends Application {
     public static Socket getSocket() {
         return mSocket;
     }
+
+    public static String id;
+    public static String getidcliente(){
+        return id;
+    }
+    public static void setidcliente(String myid){
+        id=myid;
+    }
 }

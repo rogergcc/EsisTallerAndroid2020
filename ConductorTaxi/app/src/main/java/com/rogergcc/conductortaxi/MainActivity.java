@@ -5,9 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.socket.client.Ack;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
@@ -59,6 +65,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    public void mifinalizar(View view) {
+        Button btnfinalizar=findViewById(R.id.btnfinalizar);
+        btnfinalizar.setVisibility(View.INVISIBLE);
+
+        //Detiene el Servicio de Localizacion (OnDestroy) del ServicioLocalizacion
+        stopService(new Intent(MainActivity.this,
+                ServicioLocalizacion.class));
+
+        JSONObject misdatos = new JSONObject();
+        try {
+            misdatos.put("id",App.getidcliente());
+        } catch (JSONException e) {
+            Log.e("JSONExceptionPresenter", e.toString());
+        }
+        mSocket.emit("abordo", misdatos, new Ack() {
+            @Override
+            public void call(Object... args) {
+                String res = (String) args[0];
+                if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
+                else Log.i("mimensaje", "Hubo error en el envio");
+            }
+        });
+    }
+
     private Emitter.Listener solicitudtaxi = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
@@ -67,7 +97,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             try {
                 latcli = paramsRequest.getDouble("latitude");
                 loncli = paramsRequest.getDouble("longitude");
+
+                //socket id del cliente
                 idcli = paramsRequest.getString("socket");
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -79,6 +112,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 mapa.addMarker(new MarkerOptions().position(new LatLng(latcli,loncli)).title("Ubicacion Cliente"));
+
+                                                JSONObject misdatos = new JSONObject();
+                                                EditText miedt=findViewById(R.id.miedt);
+                                                Button btnfinalizar=findViewById(R.id.btnfinalizar);
+                                                btnfinalizar.setVisibility(View.VISIBLE);
+                                                App.setidcliente(idcli);
+                                                try {
+                                                    misdatos.put("datotaxi", miedt.getText());
+                                                    misdatos.put("id",idcli);
+                                                } catch (JSONException e) {
+                                                    Log.e("JSONExceptionPresenter", e.toString());
+                                                }
+                                                mSocket.emit("accept", misdatos, new Ack() {
+                                                    @Override
+                                                    public void call(Object... args) {
+                                                        String res = (String) args[0];
+                                                        if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
+                                                        else Log.i("mimensaje", "Hubo error en el envio");
+                                                    }
+                                                });
+
+
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                                    startForegroundService(new Intent(MainActivity.this, ServicioLocalizacion.class));
+                                                } else {
+                                                    startService(new Intent(MainActivity.this,
+                                                            ServicioLocalizacion.class));
+                                                }
+
                                             }
                                         })
                                 .setNegativeButton("Rechazar", new DialogInterface.OnClickListener() {

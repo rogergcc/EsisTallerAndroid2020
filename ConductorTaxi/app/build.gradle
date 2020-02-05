@@ -35,4 +35,5 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 
+    implementation 'com.google.android.gms:play-services-location:15.0.1'
 }

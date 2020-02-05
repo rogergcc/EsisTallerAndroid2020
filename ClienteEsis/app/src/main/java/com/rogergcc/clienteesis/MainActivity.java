@@ -1,10 +1,5 @@
 package com.rogergcc.clienteesis;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,12 +16,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -45,10 +48,10 @@ import java.util.List;
 
 import io.socket.client.Ack;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback
-    ,LocationListener
-    {
+        , LocationListener {
     LatLng pos;
     GoogleMap mapa;
 
@@ -59,26 +62,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String[] multiple_permissions = {
             Manifest.permission.ACCESS_FINE_LOCATION
     };
+    private String miconductor="";
+    private Marker mimarker;
 
-
-    private void locationEnabled () {
+    private void locationEnabled() {
         LocationManager lm = (LocationManager)
-                getSystemService(Context. LOCATION_SERVICE ) ;
+                getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = false;
         boolean network_enabled = false;
         try {
             if (lm != null) {
-                gps_enabled = lm.isProviderEnabled(LocationManager. GPS_PROVIDER ) ;
+                gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
             }
         } catch (Exception e) {
-            e.printStackTrace() ;
+            e.printStackTrace();
         }
         try {
             if (lm != null) {
-                network_enabled = lm.isProviderEnabled(LocationManager. NETWORK_PROVIDER ) ;
+                network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             }
         } catch (Exception e) {
-            e.printStackTrace() ;
+            e.printStackTrace();
         }
 //        if (!gps_enabled && !network_enabled) {
 //            new AlertDialog.Builder(MainActivity. this )
@@ -95,17 +99,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        }
 
         if (!gps_enabled) {
-            new AlertDialog.Builder(MainActivity. this )
-                    .setMessage( "GPS Enable" )
-                    .setPositiveButton( "Settings" , new
+            new AlertDialog.Builder(MainActivity.this)
+                    .setMessage("GPS Enable")
+                    .setPositiveButton("Settings", new
                             DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick (DialogInterface paramDialogInterface , int paramInt) {
-                                    startActivity( new Intent(Settings. ACTION_LOCATION_SOURCE_SETTINGS )) ;
+                                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                                 }
                             })
-                    .setNegativeButton( "Cancel" , null )
-                    .show() ;
+                    .setNegativeButton("Cancel", null)
+                    .show();
         }
     }
 
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void requestSinglePermission(){
+    private void requestSinglePermission() {
         Dexter.withActivity(this)
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
@@ -177,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Dexter.withActivity(this)
                 .withPermissions(
                         Manifest.permission.ACCESS_FINE_LOCATION
-                        ,Manifest.permission.ACCESS_COARSE_LOCATION
+                        , Manifest.permission.ACCESS_COARSE_LOCATION
 
                 )
                 .withListener(new MultiplePermissionsListener() {
@@ -215,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
 
-
                     @Override
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                         token.continuePermissionRequest();
@@ -233,11 +236,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    private void turnGPSOn(){
-        Log.e("Tag","turnGPSOn method ");
+    private void turnGPSOn() {
+        Log.e("Tag", "turnGPSOn method ");
         String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 
-        if(!provider.contains("gps")){ //if gps is disabled
+        if (!provider.contains("gps")) { //if gps is disabled
             final Intent poke = new Intent();
             poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
             poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
@@ -245,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             sendBroadcast(poke);
         }
     }
-
 
 
     @Override
@@ -258,20 +260,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        requestSinglePermission();
 
 
-
-
     }
 
-    public void initSocket(){
+    public void initSocket() {
         mSocket = App.getSocket();
 
-        //mSocket.on("taxiencontrado", taxiencontrado);
-        //mSocket.on("localizacion",localizacion);
-        //mSocket.on("Abordo",abordo);
+        mSocket.on("taxiencontrado", taxiencontrado);
+        mSocket.on("localizacion", localizacion);
+        mSocket.on("Abordo", abordo);
 
         mSocket.connect();
     }
-    public void init(){
+
+    public void init() {
         btn_pedir_taxi.setEnabled(true);
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.mapa);
@@ -282,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mapa = googleMap;
         pos = new LatLng(-18.011737, -70.253529);
-        mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
+        mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 17));
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
@@ -302,16 +303,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return;
             }
             if (locationManager != null) {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1,  this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
             }
             //Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) != null)
-            {
+            if (locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) != null) {
 
 //            double myCurrentLatitude = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
 //
 //            double myCurrentLongitude = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
-                locationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+                locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
                 List<String> providers = locationManager.getProviders(true);
                 Location bestLocation = null;
                 for (String provider : providers) {
@@ -360,30 +360,113 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     else Log.i("mimensaje", "Hubo error en el envio");
                 }
             });
-        }
-        else
-            Toast.makeText(this,"no se ha encontrado su ubicación",Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, "no se ha encontrado su ubicación", Toast.LENGTH_SHORT).show();
     }
 
 
-        @Override
-        public void onLocationChanged(Location location) {
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            String hasta = latLng.toString().substring(9);
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
+    @Override
+    public void onLocationChanged(Location location) {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        String hasta = latLng.toString().substring(9);
     }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+
+    private Emitter.Listener taxiencontrado = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            Log.i("misdatos","taxiencontrado");
+            final JSONObject paramsRequest = (JSONObject) args[0];
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Log.i("misdatos","check:"+paramsRequest);
+                        miconductor = paramsRequest.getString("datotaxi");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage("Felicidades el señor " + miconductor + " atendera su pedido")
+                                .setTitle("Conductor encontrado")
+                                .setCancelable(false)
+                                .setNeutralButton("Aceptar",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                    } catch(
+                            JSONException e)
+                    {
+                        Log.e("JSONException", e.toString());
+                    }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener localizacion = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            Log.i("localizacion","nuevalocalizacion");
+            JSONObject paramsRequest = (JSONObject) args[0];
+            final Double latcond,loncond;
+            try {
+                Log.i("localizacion","nuevalocalizacion:"+paramsRequest.toString());
+                latcond = paramsRequest.getDouble("lat");
+                loncond = paramsRequest.getDouble("lon");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mimarker!=null)
+                        {
+                            mimarker.remove();
+                        }
+                        mimarker= mapa.addMarker(new MarkerOptions().position(new LatLng(latcond, loncond))
+                                .icon(BitmapDescriptorFactory
+                                        .defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)).title(miconductor));
+                    }
+                });
+            } catch (JSONException e) {
+                Log.e("JSONException", e.toString());
+            }
+        }
+    };
+
+    private Emitter.Listener abordo = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage("Que tenga un buen viaje")
+                            .setTitle("Gracias por su preferencia")
+                            .setCancelable(false)
+                            .setNeutralButton("Aceptar",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            });
+        }
+    };
+}
