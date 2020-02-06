@@ -51,6 +51,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import io.socket.client.Ack;
@@ -72,6 +73,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String miconductor="";
     private Marker mimarker;
     private String TAG ="MainAct";
+
+
+    Double latcli;
+    Double loncli;
+    DecimalFormat df = new DecimalFormat("#.00");
 
     private void locationEnabled() {
         LocationManager lm = (LocationManager)
@@ -545,9 +551,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     try {
                         Log.e("misdatos taxicerca","check:"+paramsRequest);
-                        miconductor = paramsRequest.getString("datotaxi");
+
+                        miconductor = paramsRequest.getString("nombre_conductor");
+
+                        latcli = paramsRequest.getDouble("latitude");
+                        loncli = paramsRequest.getDouble("longitude");
+
+                        if (mapa.getMyLocation() ==null){
+                            Toast.makeText(getApplicationContext(), "No se encontro su Ubicación", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Location.distanceBetween(
+                                mapa.getMyLocation().getLatitude(), mapa.getMyLocation().getLongitude(),
+                                latcli, loncli, distance);
+
+
+                        float ditancetwodecimal = 0.0f;
+                        ditancetwodecimal = Float.valueOf(df.format(distance[0]));
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setMessage("El Taxista " + miconductor + " esta cerca")
+                        builder.setMessage("El Taxista " + miconductor + " esta cerca a :" +ditancetwodecimal+" mts")
                                 .setTitle("Conductor cerca")
                                 .setCancelable(false)
                                 .setNeutralButton(" OK",
@@ -565,10 +588,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
             });
-
-
         }
-
-
     };
+
+    private double meterDistanceBetweenPoints(float lat_a, float lng_a, float lat_b, float lng_b) {
+        float pk = (float) (180.f/Math.PI);
+
+        float a1 = lat_a / pk;
+        float a2 = lng_a / pk;
+        float b1 = lat_b / pk;
+        float b2 = lng_b / pk;
+
+        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
+        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
+        double t3 = Math.sin(a1) * Math.sin(b1);
+        double tt = Math.acos(t1 + t2 + t3);
+
+        return 6366000 * tt;
+    }
 }

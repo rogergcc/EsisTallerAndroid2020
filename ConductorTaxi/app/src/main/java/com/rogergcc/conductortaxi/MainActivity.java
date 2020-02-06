@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //Emitter Listener Recibe los datos
     private Emitter.Listener solicitudtaxi = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
@@ -167,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void micerca(View view) {
 
 
+
         JSONObject misdatos = new JSONObject();
 //        try {
 //            misdatos.put("id",App.getidcliente());
@@ -184,10 +187,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         EditText miedt=findViewById(R.id.miedt);
 
 
+        if (mapa.getMyLocation() ==null){
+            Toast.makeText(this, "no se ha encontrado su ubicación", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         App.setidcliente(idcli);
         try {
-            misdatos.put("datotaxi", miedt.getText());
             misdatos.put("id",idcli);
+            misdatos.put("nombre_conductor", miedt.getText());
+            misdatos.put("latitude", mapa.getMyLocation().getLatitude());
+            misdatos.put("longitude", mapa.getMyLocation().getLongitude());
         } catch (JSONException e) {
             Log.e("JSONExceptionPresenter", e.toString());
         }
