@@ -1,5 +1,6 @@
 package com.rogergcc.conductortaxi;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -109,8 +110,12 @@ public class ServicioLocalizacion extends Service {
                 Toast.LENGTH_SHORT).show();
         NotificationCompat.Builder notific = new NotificationCompat.Builder(this)
                 .setContentTitle("Servicio de localizaciones")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentText("En un servicio");
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+//                .setDefaults(Notification.DEFAULT_SOUND)
+                .setDefaults(Notification.DEFAULT_SOUND)
+                .setContentText("En un servicio")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
         NotificationManager notificationManager = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

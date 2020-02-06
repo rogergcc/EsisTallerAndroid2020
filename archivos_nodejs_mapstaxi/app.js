@@ -41,9 +41,16 @@ io.on('connection', (socket)=>{
 		cb('OK');
 	}
 
-	// TArea EMITER AL CONDUCTOR Y SOOCKET.ON EN CLIENTE
+	// Ejercicio EMITER AL CONDUCTOR Y SOOCKET.ON EN CLIENTE
 	//PARA  CUANDO 2 CLIENTE QUIEREN SOLICITAR UN MISMO CONDUCTOR, se debe validar con la BD quien solicituo 1ero y luego el 2do
 
+	socket.on('cerca',cerca);
+	function cerca (datos,cb){
+		console.log(datos);
+		console.log("taxista cerca");
+		io.to(datos.id).emit('taxiCerca',datos);
+		cb('OK');
+	}
 });
 http.listen(port, ()=>{
 	console.log('connected to port: ' + port)

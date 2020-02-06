@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">@color/swatch_4</color>
+    <color name="colorPrimaryDark">@color/swatch_5</color>
+    <color name="colorAccent">@color/swatch_2</color>
+
+
+    <color name="swatch_1">#dfe0e5</color>
+    <color name="swatch_2">#bbbcc4</color>
+    <color name="swatch_3">#565963</color>
+    <color name="swatch_4">#060707</color>
+    <color name="swatch_5">#747884</color>
+    <color name="swatch_6">#3a3c47</color>
+
 </resources>

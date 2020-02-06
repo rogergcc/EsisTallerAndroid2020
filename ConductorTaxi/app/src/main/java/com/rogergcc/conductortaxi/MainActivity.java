@@ -117,6 +117,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                 EditText miedt=findViewById(R.id.miedt);
                                                 Button btnfinalizar=findViewById(R.id.btnfinalizar);
                                                 btnfinalizar.setVisibility(View.VISIBLE);
+
+                                                Button btncerca=findViewById(R.id.btncerca);
+                                                btncerca.setEnabled(true);
+
+
                                                 App.setidcliente(idcli);
                                                 try {
                                                     misdatos.put("datotaxi", miedt.getText());
@@ -158,4 +163,41 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     };
+
+    public void micerca(View view) {
+
+
+        JSONObject misdatos = new JSONObject();
+//        try {
+//            misdatos.put("id",App.getidcliente());
+//        } catch (JSONException e) {
+//            Log.e("JSONExceptionPresenter", e.toString());
+//        }
+//        mSocket.emit("cerca", misdatos, new Ack() {
+//            @Override
+//            public void call(Object... args) {
+//                String res = (String) args[0];
+//                if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
+//                else Log.i("mimensaje", "Hubo error en el envio");
+//            }
+//        });
+        EditText miedt=findViewById(R.id.miedt);
+
+
+        App.setidcliente(idcli);
+        try {
+            misdatos.put("datotaxi", miedt.getText());
+            misdatos.put("id",idcli);
+        } catch (JSONException e) {
+            Log.e("JSONExceptionPresenter", e.toString());
+        }
+        mSocket.emit("cerca", misdatos, new Ack() {
+            @Override
+            public void call(Object... args) {
+                String res = (String) args[0];
+                if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
+                else Log.i("mimensaje", "Hubo error en el envio");
+            }
+        });
+    }
 }

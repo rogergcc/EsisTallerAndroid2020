@@ -5,19 +5,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -28,6 +34,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.karumi.dexter.Dexter;
@@ -64,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     };
     private String miconductor="";
     private Marker mimarker;
+    private String TAG ="MainAct";
 
     private void locationEnabled() {
         LocationManager lm = (LocationManager)
@@ -255,6 +263,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        // Toolbar :: Transparent
+        toolbar.setBackgroundColor(Color.TRANSPARENT);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("EsisUberBus");
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Status bar :: Transparent
+        Window window = this.getWindow();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        }
+
         btn_pedir_taxi = findViewById(R.id.btn_pedir_taxi);
         requestMultiplePermission();
 //        requestSinglePermission();
@@ -268,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mSocket.on("taxiencontrado", taxiencontrado);
         mSocket.on("localizacion", localizacion);
         mSocket.on("Abordo", abordo);
+        mSocket.on("taxiCerca", taxiCerca);
 
         mSocket.connect();
     }
@@ -282,6 +310,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mapa = googleMap;
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = mapa.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.uber_style));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
+
         pos = new LatLng(-18.011737, -70.253529);
         mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 17));
         if (ContextCompat.checkSelfPermission(this,
@@ -289,6 +332,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 PackageManager.PERMISSION_GRANTED) {
 
             mapa.setMyLocationEnabled(true);
+
+
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -468,5 +513,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
+    };
+
+    private Emitter.Listener taxiCerca = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+
+            final float[] distance = new float[2];
+//            Location.distanceBetween(userLocation.latitude, userLocation.longitude,
+//                    latituCirculo, loongCirculo, distance);
+//            radioDeZonaTrabajo[0] = circle.getRadius();
+//
+//            userObtenerID = zonasList.get(i).getUsuarioID();
+//
+//            if ((distance[0] < radio) && codigoUsuario.equals(userObtenerID)) {
+//                habilitarAcceso = true;
+//                codigoZonaTrabajo=zonasList.get(i).getZonaTrabajoId();
+//            } else {
+//
+//                habilitarAcceso = (habilitarAcceso) ? habilitarAcceso : false;
+//            }
+
+            Log.i("misdatostaxicerca","el taxi esta cerca");
+            final JSONObject paramsRequest = (JSONObject) args[0];
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // alarmSound = ringtoneMgr.getRingtoneUri(alarmChosen);
+//                    Ringtone r = RingtoneManager.getRingtone(getActivity(), alarmSound);
+//                    r.play();
+
+                    try {
+                        Log.e("misdatos taxicerca","check:"+paramsRequest);
+                        miconductor = paramsRequest.getString("datotaxi");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage("El Taxista " + miconductor + " esta cerca")
+                                .setTitle("Conductor cerca")
+                                .setCancelable(false)
+                                .setNeutralButton(" OK",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                    } catch(
+                            JSONException e)
+                    {
+                        Log.e("JSONException", e.toString());
+                    }
+                }
+            });
+
+
+        }
+
+
     };
 }
