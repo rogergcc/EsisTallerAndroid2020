@@ -51,6 +51,7 @@ io.on('connection', (socket)=>{
 		io.to(datos.id).emit('taxiCerca',datos);
 		cb('OK');
 	}
+	
 });
 http.listen(port, ()=>{
 	console.log('connected to port: ' + port)

@@ -44,9 +44,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.mapa);
         mapFragment.getMapAsync(this);
+
         mSocket = App.getSocket();
         mSocket.on("solicitudtaxi", solicitudtaxi);
         mSocket.connect();
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void mifinalizar(View view) {
         Button btnfinalizar=findViewById(R.id.btnfinalizar);
         btnfinalizar.setVisibility(View.INVISIBLE);
+
+        Button btncerca=findViewById(R.id.btncerca);
+        btncerca.setEnabled(false);
 
         //Detiene el Servicio de Localizacion (OnDestroy) del ServicioLocalizacion
         stopService(new Intent(MainActivity.this,
@@ -167,30 +172,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     };
 
     public void micerca(View view) {
-
-
-
         JSONObject misdatos = new JSONObject();
-//        try {
-//            misdatos.put("id",App.getidcliente());
-//        } catch (JSONException e) {
-//            Log.e("JSONExceptionPresenter", e.toString());
-//        }
-//        mSocket.emit("cerca", misdatos, new Ack() {
-//            @Override
-//            public void call(Object... args) {
-//                String res = (String) args[0];
-//                if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
-//                else Log.i("mimensaje", "Hubo error en el envio");
-//            }
-//        });
         EditText miedt=findViewById(R.id.miedt);
-
-
         if (mapa.getMyLocation() ==null){
             Toast.makeText(this, "no se ha encontrado su ubicación", Toast.LENGTH_SHORT).show();
             return;
         }
+
 
         App.setidcliente(idcli);
         try {
