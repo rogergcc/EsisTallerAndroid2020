@@ -3,6 +3,23 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
+
+    lintOptions {
+        checkReleaseBuilds false
+// Or, if you prefer, you can continue to check for errors in release builds,
+// but continue the build even when errors are found:
+        abortOnError false
+    }
+    signingConfigs {
+        config {
+            keyAlias 'keymifotodrive'
+            keyPassword '87654321'
+            storeFile file('D:/GitHub/keysAndroid/mifotodrive.jks')
+            storePassword '12345678'
+        }
+    }
+
+
     defaultConfig {
         applicationId "com.rogergcc.mifotodrive"
         minSdkVersion 16
@@ -15,6 +32,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }
@@ -26,4 +44,16 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation 'com.google.http-client:google-http-client-gson:1.17.0-rc'
+    implementation 'com.google.api-client:google-api-client-xml:1.17.0-rc'
+    implementation 'com.google.api-client:google-api-client-android:1.17.0-rc'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev52-1.22.0'
+    implementation 'com.google.android.gms:play-services-auth:10.0.1'
+    configurations {
+        all*.exclude group: 'xpp3', module: 'xpp3'
+        compile.exclude group: "org.apache.httpcomponents",
+                module: "httpclient"
+    }
+
 }
