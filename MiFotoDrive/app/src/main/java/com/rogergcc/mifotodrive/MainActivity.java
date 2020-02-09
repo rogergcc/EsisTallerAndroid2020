@@ -1,12 +1,15 @@
 package com.rogergcc.mifotodrive;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.content.CursorLoader;
 
+import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -16,6 +19,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,12 +34,20 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.DexterError;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,11 +70,92 @@ public class MainActivity extends AppCompatActivity {
     private static Uri uriFichero;
     private String idCarpeta = "";
 
+    private String[] multiple_permissions = {
+            Manifest.permission.GET_ACCOUNTS,
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    };
+
+    static final String DISPLAY_MESSAGE_ACTION = "com.rogergcc.mifotodrive.DISPLAY_MESSAGE";
+
+    //region Runtime Permissions
+    private void openSettingsDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Required Permissions");
+        builder.setMessage("This app require permission to use awesome feature. Grant them in app settings.");
+        builder.setPositiveButton("Take Me To SETTINGS", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivityForResult(intent, 101);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+
+    }
+
+    private void requestMultiplePermission() {
+        Dexter.withActivity(this)
+                .withPermissions(
+                        multiple_permissions
+
+                )
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        // check if all permissions are granted
+                        if (report.areAllPermissionsGranted()) {
+                            Toast.makeText(getApplicationContext(), "All permissions are granted by user!", Toast.LENGTH_SHORT).show();
+                            init();
+                            initAutorization();
+                        }
+
+                        // check for permanent denial of any permission
+                        else if (report.isAnyPermissionPermanentlyDenied()) {
+                            // check for permanent denial of any permission show alert dialog
+                            // navigating to Settings
+                            openSettingsDialog();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "All permissions are not granted..",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+//                        if (report.isAnyPermissionPermanentlyDenied()) {
+//                            // show alert dialog navigating to Settings
+//                            openSettingsDialog();
+//                        }
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).
+                withErrorListener(new PermissionRequestErrorListener() {
+                    @Override
+                    public void onError(DexterError error) {
+                        Toast.makeText(getApplicationContext(), "Some Error! ", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .onSameThread()
+                .check();
+
+    }
+
+
+    public void init() {
         credencial = GoogleAccountCredential.usingOAuth2(this,
                 Arrays.asList(DriveScopes.DRIVE));
 
@@ -71,6 +164,9 @@ public class MainActivity extends AppCompatActivity {
         nombreCuenta = prefs.getString("nombreCuenta", null);
         noAutoriza = prefs.getBoolean("noAutoriza",false);
         idCarpeta = prefs.getString("idCarpeta", null);
+
+    }
+    public void initAutorization() {
         if (!noAutoriza){
             if (nombreCuenta == null) {
                 PedirCredenciales();
@@ -82,6 +178,17 @@ public class MainActivity extends AppCompatActivity {
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
+    }
+
+    //endregion
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        requestMultiplePermission();
+
     }
         //1B-qdox4aDfoYBCjrSg_Z4e6tQDuxkVX7
     private void PedirCredenciales() {
@@ -105,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                         servicio = obtenerServicioDrive(credencial);
                         editor = prefs.edit();
                         editor.putString("nombreCuenta", nombreCuenta);
-                        editor.apply();
+                        editor.commit();
                         crearCarpetaEnDrive(nombreCuenta);
                     }
                 }
@@ -158,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
 //                        metadataFichero.setParents(Collections.singletonList("1pkd2fc8m26___TU_ID_CARPETA_2QQywRSkm3"));
 //                        metadataFichero.setParents(Collections.singletonList("1B-qdox4aDfoYBCjrSg_Z4e6tQDuxkVX7"));
 //                        https://drive.google.com/drive/folders/1rIUCEwJdsSCBvUefv7Qge9H1wGsAvmiN?usp=sharing
-                        metadataFichero.setParents(Collections.singletonList("1rIUCEwJdsSCBvUefv7Qge9H1wGsAvmiN"));
+//                        metadataFichero.setParents(Collections.singletonList("1rIUCEwJdsSCBvUefv7Qge9H1wGsAvmiN"));
                         File fichero = servicio.files().create(metadataFichero).setFields("id").execute();
                         if (fichero.getId() != null) {
                             editor = prefs.edit();

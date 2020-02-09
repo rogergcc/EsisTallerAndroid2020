@@ -45,6 +45,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/btncerca"
             android:text="Taxi Cerca"
+
             android:enabled="false"
             android:onClick="micerca"/>
 

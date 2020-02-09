@@ -55,5 +55,5 @@ dependencies {
         compile.exclude group: "org.apache.httpcomponents",
                 module: "httpclient"
     }
-
+    implementation 'com.karumi:dexter:5.0.0'
 }

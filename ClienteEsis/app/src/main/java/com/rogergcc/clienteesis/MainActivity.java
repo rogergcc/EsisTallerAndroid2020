@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -78,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Double latcli;
     Double loncli;
     DecimalFormat df = new DecimalFormat("#.00");
+    private Uri notification;
+    private Ringtone r;
+
 
     private void locationEnabled() {
         LocationManager lm = (LocationManager)
@@ -275,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         toolbar.setBackgroundColor(Color.TRANSPARENT);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("EsisUberBus");
+        getSupportActionBar().setTitle("EsisUber");
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Status bar :: Transparent
@@ -307,6 +312,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void init() {
+        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        r = RingtoneManager.getRingtone(getApplicationContext(), notification);
         btn_pedir_taxi.setEnabled(true);
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.mapa);
@@ -550,6 +557,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    r.play();
 
                     try {
+
+                        r.play();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
                         Log.e("misdatos taxicerca","check:"+paramsRequest);
 
                         miconductor = paramsRequest.getString("nombre_conductor");
@@ -591,19 +605,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     };
 
-    private double meterDistanceBetweenPoints(float lat_a, float lng_a, float lat_b, float lng_b) {
-        float pk = (float) (180.f/Math.PI);
-
-        float a1 = lat_a / pk;
-        float a2 = lng_a / pk;
-        float b1 = lat_b / pk;
-        float b2 = lng_b / pk;
-
-        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
-        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
-        double t3 = Math.sin(a1) * Math.sin(b1);
-        double tt = Math.acos(t1 + t2 + t3);
-
-        return 6366000 * tt;
-    }
 }
