@@ -3,14 +3,18 @@ package com.rogergcc.mifotodrive;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.content.CursorLoader;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -20,9 +24,11 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +40,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -41,9 +48,12 @@ import com.karumi.dexter.listener.DexterError;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.rogergcc.mifotodrive.adapter.DataAdapter;
+import com.rogergcc.mifotodrive.model.ImageUrl;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -78,6 +88,14 @@ public class MainActivity extends AppCompatActivity {
     };
 
     static final String DISPLAY_MESSAGE_ACTION = "com.rogergcc.mifotodrive.DISPLAY_MESSAGE";
+
+    //para el recycler de imagenes
+//    private ImageView imageView;
+    RecyclerView recyclerView;
+    GridLayoutManager gridLayoutManager;
+    ArrayList<ImageUrl> imageUrlList;
+    DataAdapter dataAdapter;
+
 
     //region Runtime Permissions
     private void openSettingsDialog() {
@@ -173,6 +191,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 credencial.setSelectedAccountName(nombreCuenta);
                 servicio = obtenerServicioDrive(credencial);
+
+                //todo add
+                if (idCarpeta != null) {
+                    listarFicheros(this.findViewById(android.R.id.content));
+                }
             }
         }
 
@@ -183,12 +206,63 @@ public class MainActivity extends AppCompatActivity {
     //endregion
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+    private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String nuevoMensaje = intent.getExtras().getString("mensaje");
+            mDisplay.setText(nuevoMensaje);
+        }
+    };
+    static void mostrarTexto(Context contexto, String mensaje) {
+        Intent intent = new Intent(DISPLAY_MESSAGE_ACTION);
+        intent.putExtra("mensaje", mensaje);
+        contexto.sendBroadcast(intent);
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        requestMultiplePermission();
+        registerReceiver(mHandleMessageReceiver, new
+                IntentFilter(DISPLAY_MESSAGE_ACTION));
+        mDisplay = (TextView) findViewById(R.id.txtDisplay);
 
+        credencial = GoogleAccountCredential.usingOAuth2(this,
+                Arrays.asList(DriveScopes.DRIVE));
+        prefs = getSharedPreferences("Preferencias", Context.MODE_PRIVATE);
+        nombreCuenta = prefs.getString("nombreCuenta", null);
+        noAutoriza = prefs.getBoolean("noAutoriza",false);
+        if (!noAutoriza){
+            if (nombreCuenta == null) {
+                PedirCredenciales();
+            } else {
+                credencial.setSelectedAccountName(nombreCuenta);
+                servicio = obtenerServicioDrive(credencial);
+                if (idCarpeta != null) {
+                    listarFicheros(this.findViewById(android.R.id.content));
+                }
+
+            }
+        }
+        idCarpeta = prefs.getString("idCarpeta", null);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
+
+        imageUrlList=new ArrayList<>();
+       // imageView = (ImageView) findViewById(R.id.imageView);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        dataAdapter = new DataAdapter(getApplicationContext(), imageUrlList);
+        recyclerView.setAdapter(dataAdapter);
     }
         //1B-qdox4aDfoYBCjrSg_Z4e6tQDuxkVX7
     private void PedirCredenciales() {
@@ -351,6 +425,16 @@ public class MainActivity extends AppCompatActivity {
                     File ficheroSubido = servicio.files().create(ficheroDrive, contenido).setFields("id").execute();
                     if (ficheroSubido.getId() != null) {
                         mostrarMensaje(MainActivity.this, "¡Foto subida!");
+
+                        listarFicheros(view);
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                dataAdapter.update(imageUrlList);
+                            }
+                        });
                     }
                     ocultarCarga(MainActivity.this);
                 } catch (UserRecoverableAuthIOException e) {
@@ -364,6 +448,50 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         t.start();
+    }
+
+    public void listarFicheros(View v) {
+        if (nombreCuenta == null) {
+            mostrarMensaje(this,
+                    "Debes seleccionar una cuenta de Google Drive");
+        } else {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mostrarCarga(MainActivity.this, "Listando archivos...");
+                        FileList ficheros = servicio.files().list()
+                                .setQ("'" + idCarpeta + "' in parents")
+                                .setFields("*")
+                                .execute();
+                        imageUrlList.clear();
+                        String mimensaje="";
+                        for (File fichero : ficheros.getFiles()) {
+                            mimensaje=mimensaje+fichero.getOriginalFilename() + "\n";
+                            Log.i("listando","id:"+fichero.getId());
+                            ImageUrl imageUrl = new ImageUrl("https://drive.google.com/uc?export=download&id="+fichero.getId());
+                            imageUrlList.add(imageUrl);
+                        }
+                        mostrarTexto(getBaseContext(), mimensaje);
+                        mostrarMensaje(MainActivity.this,
+                                "¡Archivos listados!");
+                        ocultarCarga(MainActivity.this);
+                    }
+
+                    catch (UserRecoverableAuthIOException e) {
+                        ocultarCarga(MainActivity.this);
+                        startActivityForResult(e.getIntent(),
+                                SOLICITUD_AUTORIZACION);
+                    } catch (IOException e) {
+                        mostrarMensaje(MainActivity.this,
+                                "Error;" + e.getMessage());
+                        ocultarCarga(MainActivity.this);
+                        e.printStackTrace();
+                    }
+                }
+            });
+            t.start();
+        }
     }
 
     @Override
