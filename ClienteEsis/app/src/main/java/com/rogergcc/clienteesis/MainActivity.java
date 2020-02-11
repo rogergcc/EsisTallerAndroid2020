@@ -400,6 +400,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void pedir(View view) {
 
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(new Intent(MainActivity.this, SocketBackgroundService.class));
+//        } else {
+//            startService(new Intent(MainActivity.this,
+//                    SocketBackgroundService.class));
+//        }
+
         locationEnabled();
 
         if (mapa.getMyLocation() != null) {
