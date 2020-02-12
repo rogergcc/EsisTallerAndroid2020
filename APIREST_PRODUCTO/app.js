@@ -1,10 +1,17 @@
 var express = require('express');var app = express();
-var bodyParser = require('body-parser');var product = require('./routes/product');
-var mongoose = require('mongoose');var eConfig = JSON.parse(process.env.APP_CONFIG);
+var bodyParser = require('body-parser');
+var product = require('./routes/product');
+
+var mongoose = require('mongoose');
+var eConfig = JSON.parse(process.env.APP_CONFIG);
 var dev_db_url = "mongodb://" + eConfig.mongo.user + ":" + "1234qwer" + "@" +
 eConfig.mongo.hostString;
-var mongoDB = process.env.MONGODB_URI || dev_db_url;mongoose.connect(mongoDB);
+
+var mongoDB = process.env.MONGODB_URI || dev_db_url;
+
+mongoose.connect(mongoDB,{ useUnifiedTopology: true,useNewUrlParser: true });
 mongoose.Promise = global.Promise;var db = mongoose.connection;
+
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
