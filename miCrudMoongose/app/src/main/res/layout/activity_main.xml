@@ -17,7 +17,7 @@
         <Button
             android:layout_weight="1"
             android:id="@+id/btn_create"
-            android:drawableLeft="@drawable/ic_create"
+
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="C reate"
@@ -27,7 +27,7 @@
         <Button
             android:layout_weight="1"
             android:id="@+id/btn_read"
-            android:drawableLeft="@drawable/ic_read"
+
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="R ead"
@@ -42,7 +42,7 @@
         <Button
             android:layout_weight="1"
             android:id="@+id/btn_update"
-            android:drawableLeft="@drawable/ic_update"
+
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="U pdate"
@@ -53,7 +53,7 @@
         <Button
             android:layout_weight="1"
             android:id="@+id/btn_delete"
-            android:drawableLeft="@drawable/ic_delete"
+
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="D elete"
