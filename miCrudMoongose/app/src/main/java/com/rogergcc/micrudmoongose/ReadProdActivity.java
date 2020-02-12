@@ -22,6 +22,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class ReadProdActivity extends AppCompatActivity {
 
     Retrofit retrofit; servicesRetrofit miserviceretrofit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +45,10 @@ public class ReadProdActivity extends AppCompatActivity {
                 Log.e("mirespuesta: ", response.toString());
                 for(Productos res : response.body()) {
                     Log.e("mirespuesta: ","id="+res.getId()+" prod="+res.getName() +" precio"+res.getPrice());
+
                 }
             }
+
             @Override
             public void onFailure(Call<List<Productos>> call, Throwable t) {
                 Log.e("onFailure", t.toString());// mostrmos el error

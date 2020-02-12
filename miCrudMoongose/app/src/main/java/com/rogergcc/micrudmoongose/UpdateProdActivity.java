@@ -34,7 +34,7 @@ public class UpdateProdActivity extends AppCompatActivity {
         Gson gson = new GsonBuilder().setLenient().create();
         retrofit = new Retrofit.Builder()
                 .baseUrl(url)
-                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())// solo para devolucion tipo cadena
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         miserviceretrofit = retrofit.create(servicesRetrofit.class);

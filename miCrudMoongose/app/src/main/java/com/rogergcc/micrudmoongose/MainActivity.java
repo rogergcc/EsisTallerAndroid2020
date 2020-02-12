@@ -76,22 +76,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent;
         switch(view.getId()){
 
-            case R.id.btn_create: /** Start a new Activity MyCards.java */
+            case R.id.btn_create:
                  intent = new Intent(this, CreateProdActivity.class);
                 this.startActivity(intent);
                 break;
 
-            case R.id.btn_read: /** AlerDialog when click on Exit */
+            case R.id.btn_read:
                  intent = new Intent(this, ReadProdActivity.class);
                 this.startActivity(intent);
                 break;
 
-            case R.id.btn_update: /** AlerDialog when click on Exit */
+            case R.id.btn_update:
                 intent = new Intent(this, UpdateProdActivity.class);
                 this.startActivity(intent);
                 break;
 
-            case R.id.btn_delete: /** AlerDialog when click on Exit */
+            case R.id.btn_delete:
                 intent = new Intent(this, DeleteProdActivity.class);
                 this.startActivity(intent);
                 break;
