@@ -1,34 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp"
-    tools:context=".CreateProdActivity"
-    android:orientation="vertical">
-    <EditText
-        style="@style/Widget.AppCompat.EditText"
+    android:orientation="vertical"
+    android:padding="@dimen/normal_padding"
+    tools:context=".CreateProdActivity">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nombre Producto"
-        android:id="@+id/edtnomprod"
-        />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Precio Producto"
-        android:id="@+id/edtprecio"
-        />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Button
 
-        style="@style/Widget.AppCompat.Button.Colored"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/title_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_top"
+            android:textColorHint="@color/color_hint">
 
+            <EditText
+                android:id="@+id/edtnomprod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="16dp"
+
+                android:fontFamily="@font/calibri"
+                android:hint="@string/hint_producto"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/title_product_precio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_top"
+            android:textColorHint="@color/color_hint">
+
+            <EditText
+                android:id="@+id/edtprecio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="16dp"
+
+                android:fontFamily="@font/calibri"
+                android:hint="@string/hint_producto_precio"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <Button
+
+            style="@style/Widget.AppCompat.Button.Colored"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_top"
+            android:onClick="nuevoproducto"
+            android:text="@string/btn_add_product" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="nuevo"
-        android:onClick="nuevoproducto"
-        />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
 
-</LinearLayout>
+        android:layout_marginBottom="16dp"
+        android:onClick="add_product"
+        android:src="@drawable/ic_check_white_24dp"
+        android:visibility="gone" />
+
+</RelativeLayout>

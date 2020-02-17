@@ -11,15 +11,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
+
         <EditText
-
-            android:layout_width="0dp"
             android:layout_weight="60"
-            android:layout_height="wrap_content"
-            android:hint="Nombre Producto"
             android:id="@+id/edtnomprod"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:drawablePadding="16dp"
 
-            />
+            android:fontFamily="@font/calibri"
+            android:hint="@string/hint_producto"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textSize="16sp" />
 
         <Button
 
@@ -39,6 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="actualizar"
+        android:enabled="false"
         android:onClick="updateproducto"
         />
 </LinearLayout>

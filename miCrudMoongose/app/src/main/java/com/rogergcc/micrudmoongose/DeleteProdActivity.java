@@ -3,6 +3,7 @@ package com.rogergcc.micrudmoongose;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +31,13 @@ public class DeleteProdActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delete_prod);
+
+        if(getActionBar()==null){
+            String title = getResources().getString(R.string.title_delete);
+            getSupportActionBar().setTitle(title);
+        }
+
+
         final String url = "http://esiscrud2020.eu-4.evennode.com/";
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setLenient();
@@ -61,6 +69,14 @@ public class DeleteProdActivity extends AppCompatActivity {
     }
 
     public void buscar(View view) {
+
+        String ed_text = edtnombre.getText().toString();
+        if(TextUtils.isEmpty(ed_text))
+        {
+            Toast.makeText(this, "Ingrese el producto a buscar", Toast.LENGTH_SHORT).show();
+
+            return;
+        }
         Call<Productos> call = miserviceretrofit.getproducto(edtnombre.getText().toString());
         call.enqueue(new Callback<Productos>() {
             @Override

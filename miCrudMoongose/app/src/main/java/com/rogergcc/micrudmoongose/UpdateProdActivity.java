@@ -30,6 +30,13 @@ public class UpdateProdActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_prod);
+
+        if(getActionBar()==null){
+            String title = getResources().getString(R.string.title_update);
+            getSupportActionBar().setTitle(title);
+        }
+
+
         final String url = "http://esiscrud2020.eu-4.evennode.com/";
         Gson gson = new GsonBuilder().setLenient().create();
         retrofit = new Retrofit.Builder()
@@ -87,6 +94,7 @@ public class UpdateProdActivity extends AppCompatActivity {
                 Log.e("cargarproducto",t.toString());
             }
         });
+
     }
 
 }

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">miCrudMoongose</string>
+    <string name="title_create">Nuevo Producto</string>
+    <string name="title_update">Actualizar Producto</string>
+    <string name="title_delete">Eliminar Producto</string>
+    <string name="title_list">Productos</string>
+    <string name="hint_producto">Nombre </string>
+    <string name="hint_producto_precio">Precio </string>
+    <string name="btn_add_product">agregar producto</string>
 </resources>

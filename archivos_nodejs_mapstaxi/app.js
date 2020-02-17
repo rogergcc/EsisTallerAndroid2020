@@ -4,22 +4,41 @@ var port = process.env.PORT || 5000;var numuser =0;
 io.on('connection', (socket)=>{
 	numuser=numuser+1;
 	console.log("Se conecto iduser: "+ socket.id + " numuser: " + numuser);
+	
+	socket.on('misdatosconeccion',misdatos);
+	function misdatos (datos,cb){
+		console.log("----------");
+		console.log("mis datos");
+		datos.socket=socket.id;
+		console.log("----------");
+		io.to(datos.socket).emit('new_connetion',datos);
+		cb('ok');
+	}
+
+	
 	socket.on('pedirtaxi',pedirtaxi);
 	function pedirtaxi (datos,cb){
 		datos.socket=socket.id;
 		io.emit('solicitudtaxi',datos);
 		cb('OK');
 	}
+
 	socket.on('disconnect', function(){
 		numuser=numuser-1;
 		console.log("Se desconecto iduser: "+ socket.id+ " numuser: " + numuser);
 	});
 
+
 	socket.on('accept',accept);
 	function accept (datos,cb){
+		console.log("");
+		console.log("--------");
+		console.log("socket datos conductor ");
+		datos.socket=socket.id;
 		console.log(datos);
 		console.log("taxiencontrado");
 
+		console.log("--------");
 		//io to es para emitir solo al un pasajero especifico, solo al socketid que emitio accept
 		//este socket id del usuario
 		io.to(datos.id).emit('taxiencontrado',datos);
@@ -46,6 +65,7 @@ io.on('connection', (socket)=>{
 
 	socket.on('cerca',cerca);
 	function cerca (datos,cb){
+		datos.socket=socket.id;
 		console.log(datos);
 		console.log("taxista cerca");
 		io.to(datos.id).emit('taxiCerca',datos);

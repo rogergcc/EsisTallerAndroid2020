@@ -47,6 +47,7 @@ public class ServicioLocalizacion extends Service {
         if(!mSocket.connected())
             mSocket.connect();
 
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -129,6 +130,7 @@ public class ServicioLocalizacion extends Service {
         }
         startForeground(101,notific.build()
         );
+
         return START_STICKY;
 
     }

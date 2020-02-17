@@ -22,9 +22,9 @@ import java.util.ArrayList;
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
     private ArrayList<Productos> productosArrayList;
     private Context context;
-    public DataAdapter(Context context, ArrayList<Productos> imageUrls) {
+    public DataAdapter(Context context, ArrayList<Productos> productosArrayList) {
         this.context = context;
-        this.productosArrayList = imageUrls;
+        this.productosArrayList = productosArrayList;
     }
     @Override
     public DataAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {

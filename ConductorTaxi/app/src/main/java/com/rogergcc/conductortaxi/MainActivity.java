@@ -1,9 +1,5 @@
 package com.rogergcc.conductortaxi;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,15 +31,25 @@ import com.karumi.dexter.listener.DexterError;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.rogergcc.conductortaxi.model.Carrera;
+import com.rogergcc.conductortaxi.model.Productos;
+import com.rogergcc.conductortaxi.retrofit.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import io.socket.client.Ack;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -53,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Double loncli;
     String idcli;
 
+    String miId;
 
     //region Runtime Permissions
 
@@ -141,13 +152,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 
     }
+
     public void initSocket() {
         mSocket = App.getSocket();
         mSocket.on("solicitudtaxi", solicitudtaxi);
+
+        //mSocket.on("new_connetion", nuevaconnexion);
+
         mSocket.connect();
+
+//        obtenerMiId();
+
+
+
+
     }
 
     //endregion
+
+    public void obtenerMiId() {
+        JSONObject misdatos = new JSONObject();
+        try {
+            misdatos.put("cod", "-");
+
+        } catch (JSONException e) {
+            Log.e("JSONExceptionPresenter", e.toString());
+        }
+        mSocket.emit("misdatosconeccion", misdatos, new Ack() {
+            @Override
+            public void call(Object... args) {
+                String res = (String) args[0];
+                if (res.equals("OK")) Log.i("mi Datos Socket", "Se envio correctamente");
+                else Log.i("mimensaje", "Hubo error en el envio");
+            }
+        });
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,13 +196,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         requestMultiplePermission();
 
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mapa = googleMap;
         pos = new LatLng(-18.011737, -70.253529);
-        mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(pos,17));
+        mapa.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 17));
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
@@ -173,11 +214,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void mifinalizar(View view) {
-        Button btnfinalizar=findViewById(R.id.btnfinalizar);
+        Button btnfinalizar = findViewById(R.id.btnfinalizar);
         btnfinalizar.setVisibility(View.INVISIBLE);
 
-        Button btncerca=findViewById(R.id.btncerca);
+        Button btncerca = findViewById(R.id.btncerca);
         btncerca.setEnabled(false);
+
+        EditText miedt = findViewById(R.id.miedt);
+
+        Log.e("mi codigo conductor", mSocket.id());
+        String socket_id_propio = mSocket.id();
+        String socket_id_cliente = App.getidcliente();
+        String nombre_conductor= miedt.getText().toString().trim();
+
+        Log.e("socket_Id_Conductor", socket_id_propio);
+        Log.e("socket_Id_Cliente", socket_id_cliente);
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+//        Calendar cal = Calendar.getInstance();
+        Date date = new Date();
+
+        String fecha_finalizada = dateFormat.format((date));
+        String hora_finalizada = dateFormat.format(date).toString().split(" ")[1];
+
+        Carrera carrerafinalizada;
+        carrerafinalizada = new Carrera(socket_id_propio,socket_id_cliente,nombre_conductor,hora_finalizada,fecha_finalizada);
+        Call<String> call = Utils.getApi().newcarrera(carrerafinalizada);
+
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.e("carrera_finalizada: ","check:"+response.body());
+                Toast.makeText(MainActivity.this, response.body(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("carrera_finalizada_f",t.toString());
+            }
+        });
 
         //Detiene el Servicio de Localizacion (OnDestroy) del ServicioLocalizacion
         stopService(new Intent(MainActivity.this,
@@ -185,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         JSONObject misdatos = new JSONObject();
         try {
-            misdatos.put("id",App.getidcliente());
+            misdatos.put("id", App.getidcliente());
         } catch (JSONException e) {
             Log.e("JSONExceptionPresenter", e.toString());
         }
@@ -197,7 +274,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 else Log.i("mimensaje", "Hubo error en el envio");
             }
         });
+
+
     }
+
+    private Emitter.Listener nuevaconnexion = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            Log.e("nueva conexion conduc", mSocket.id());
+            miId=mSocket.id();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e("r_nueva conexion conduc", mSocket.id());
+                }
+            });
+        }
+    };
 
     //Emitter Listener Recibe los datos
     private Emitter.Listener solicitudtaxi = new Emitter.Listener() {
@@ -222,20 +315,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .setNeutralButton("Aceptar",
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                mapa.addMarker(new MarkerOptions().position(new LatLng(latcli,loncli)).title("Ubicacion Cliente"));
+                                                mapa.addMarker(new MarkerOptions().position(new LatLng(latcli, loncli)).title("Ubicacion Cliente"));
 
                                                 JSONObject misdatos = new JSONObject();
-                                                EditText miedt=findViewById(R.id.miedt);
-                                                Button btnfinalizar=findViewById(R.id.btnfinalizar);
+                                                EditText miedt = findViewById(R.id.miedt);
+                                                Button btnfinalizar = findViewById(R.id.btnfinalizar);
                                                 btnfinalizar.setVisibility(View.VISIBLE);
 
-                                                Button btncerca=findViewById(R.id.btncerca);
+                                                Button btncerca = findViewById(R.id.btncerca);
                                                 btncerca.setEnabled(true);
 
                                                 App.setidcliente(idcli);
                                                 try {
                                                     misdatos.put("datotaxi", miedt.getText());
-                                                    misdatos.put("id",idcli);
+                                                    misdatos.put("id", idcli);
                                                 } catch (JSONException e) {
                                                     Log.e("JSONExceptionPresenter", e.toString());
                                                 }
@@ -243,8 +336,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                     @Override
                                                     public void call(Object... args) {
                                                         String res = (String) args[0];
-                                                        if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
-                                                        else Log.i("mimensaje", "Hubo error en el envio");
+                                                        if (res.equals("OK"))
+                                                            Log.i("mimensaje", "Se envio correctamente");
+                                                        else
+                                                            Log.i("mimensaje", "Hubo error en el envio");
                                                     }
                                                 });
 
@@ -276,29 +371,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void micerca(View view) {
         JSONObject misdatos = new JSONObject();
-        EditText miedt=findViewById(R.id.miedt);
-        if (mapa.getMyLocation() ==null){
+        EditText miedt = findViewById(R.id.miedt);
+        if (mapa.getMyLocation() == null) {
             Toast.makeText(this, "no se ha encontrado su ubicación", Toast.LENGTH_SHORT).show();
             return;
         }
 
         App.setidcliente(idcli);
         try {
-            misdatos.put("id",idcli);
+            misdatos.put("id", idcli);
             misdatos.put("nombre_conductor", miedt.getText());
             misdatos.put("latitude", mapa.getMyLocation().getLatitude());
             misdatos.put("longitude", mapa.getMyLocation().getLongitude());
 
-    } catch (JSONException e) {
-        Log.e("JSONExceptionPresenter", e.toString());
-    }
-        mSocket.emit("cerca", misdatos, new Ack() {
-        @Override
-        public void call(Object... args) {
-            String res = (String) args[0];
-            if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
-            else Log.i("mimensaje", "Hubo error en el envio");
+        } catch (JSONException e) {
+            Log.e("JSONExceptionPresenter", e.toString());
         }
-    });
+        mSocket.emit("cerca", misdatos, new Ack() {
+            @Override
+            public void call(Object... args) {
+                String res = (String) args[0];
+                if (res.equals("OK")) Log.i("mimensaje", "Se envio correctamente");
+                else Log.i("mimensaje", "Hubo error en el envio");
+            }
+        });
     }
 }

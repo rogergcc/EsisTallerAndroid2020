@@ -469,6 +469,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .setNeutralButton("Aceptar",
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
+
+
+
                                                 dialog.cancel();
                                             }
                                         });
