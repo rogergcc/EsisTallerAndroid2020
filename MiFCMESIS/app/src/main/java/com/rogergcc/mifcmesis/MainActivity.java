@@ -5,17 +5,21 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.rogergcc.mifcmesis.service.FcmMessagingService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,9 +34,25 @@ public class MainActivity extends AppCompatActivity {
     Spinner spTopics;
     @BindView(R.id.tvTopics)
     TextView tvTopics;
+    @BindView(R.id.btn_obtener_token)
+    Button btnObtenerToken;
+    @BindView(R.id.tv_mitoken)
+    TextView tvMitoken;
+    @BindView(R.id.llTopics)
+    LinearLayout llTopics;
+    @BindView(R.id.btnSuscribir)
+    Button btnSuscribir;
+    @BindView(R.id.btnDesuscribir)
+    Button btnDesuscribir;
+    @BindView(R.id.llButtons)
+    LinearLayout llButtons;
     private Set<String> mTopicsSet;
     private SharedPreferences mSharedPreferences;
     private static final String SP_TOPICS = "sharedPreferencesTopics";
+
+
+    private static final String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private void showTopics() {
         tvTopics.setText(mTopicsSet.toString());
     }
+
     @OnClick({R.id.btnSuscribir, R.id.btnDesuscribir})
     public void onViewClicked(View view) {
         String topic = getResources().getStringArray(R.array.topicsValues)[spTopics.getSelectedItemPosition()];
@@ -87,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
     private void saveSharedPreferences() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.clear();
@@ -95,4 +117,24 @@ public class MainActivity extends AppCompatActivity {
         showTopics();
     }
 
+    @OnClick(R.id.btn_obtener_token)
+    public void onViewClicked() {
+
+
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
+                new OnCompleteListener<InstanceIdResult>() {
+                    @Override public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.e(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        Log.d(TAG, token);
+                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                        tvMitoken.setText(token);
+                    }
+                });
+
+    }
 }
