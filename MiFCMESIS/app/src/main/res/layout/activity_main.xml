@@ -61,20 +61,27 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:orientation="horizontal">
-        <Button
+        <com.google.android.material.button.MaterialButton
+            android:layout_margin="6dp"
             android:layout_weight=".5"
             android:id="@+id/btnSuscribir"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Suscribir"
             style="@style/Widget.AppCompat.Button.Colored"/>
-        <Button
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_margin="6dp"
             android:layout_weight=".5"
             android:id="@+id/btnDesuscribir"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Desuscribir"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+            android:text="desuscribir"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+
+            />
+
+
     </LinearLayout>
     <TextView
         android:layout_marginTop="16dp"

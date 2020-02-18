@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -43,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.llTopics)
     LinearLayout llTopics;
     @BindView(R.id.btnSuscribir)
-    Button btnSuscribir;
+    MaterialButton btnSuscribir;
     @BindView(R.id.btnDesuscribir)
-    Button btnDesuscribir;
+    MaterialButton btnDesuscribir;
     @BindView(R.id.llButtons)
     LinearLayout llButtons;
     private Set<String> mTopicsSet;
@@ -124,20 +125,20 @@ public class MainActivity extends AppCompatActivity {
     public void onViewClicked() {
 
 
-//        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
-//                new OnCompleteListener<InstanceIdResult>() {
-//                    @Override public void onComplete(@NonNull Task<InstanceIdResult> task) {
-//                        if (!task.isSuccessful()) {
-//                            Log.e(TAG, "getInstanceId failed", task.getException());
-//                            return;
-//                        }
-//                        // Get new Instance ID token
-//                        String token = task.getResult().getToken();
-//                        Log.d(TAG, token);
-//                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
-//                        tvMitoken.setText(token);
-//                    }
-//                });
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
+                new OnCompleteListener<InstanceIdResult>() {
+                    @Override public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.e(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        Log.d(TAG, token);
+                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                        tvMitoken.setText(token);
+                    }
+                });
 
     }
 }
