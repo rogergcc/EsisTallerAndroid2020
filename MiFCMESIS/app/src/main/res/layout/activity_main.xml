@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:id="@+id/llTopics"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar:" />
+        <Spinner
+            android:id="@+id/spTopics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="88dp"
+            android:entries="@array/topics"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnSuscribir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suscribir"
+            style="@style/Widget.AppCompat.Button.Colored"/>
+        <Button
+            android:id="@+id/btnDesuscribir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desuscribir"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tvTopics"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="topics"/>
+</LinearLayout>
