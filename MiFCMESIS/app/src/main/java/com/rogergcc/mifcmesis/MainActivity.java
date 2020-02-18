@@ -34,8 +34,10 @@ public class MainActivity extends AppCompatActivity {
     Spinner spTopics;
     @BindView(R.id.tvTopics)
     TextView tvTopics;
+
     @BindView(R.id.btn_obtener_token)
     Button btnObtenerToken;
+
     @BindView(R.id.tv_mitoken)
     TextView tvMitoken;
     @BindView(R.id.llTopics)
@@ -61,9 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         //region cuando abres la notificacion
-        if (extras != null)
-            Log.i("mifcm_roger", extras.getString("descuento"));
-        else
+        if (extras != null) {
+            if (extras.getString("descuento") !=null)
+                Log.i("mifcm_roger", extras.getString("descuento"));
+        } else
             Log.i("mifcm_roger", "no hay valores");
 
 //        endregion
@@ -121,20 +124,20 @@ public class MainActivity extends AppCompatActivity {
     public void onViewClicked() {
 
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
-                new OnCompleteListener<InstanceIdResult>() {
-                    @Override public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            Log.e(TAG, "getInstanceId failed", task.getException());
-                            return;
-                        }
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-                        Log.d(TAG, token);
-                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
-                        tvMitoken.setText(token);
-                    }
-                });
+//        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
+//                new OnCompleteListener<InstanceIdResult>() {
+//                    @Override public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                        if (!task.isSuccessful()) {
+//                            Log.e(TAG, "getInstanceId failed", task.getException());
+//                            return;
+//                        }
+//                        // Get new Instance ID token
+//                        String token = task.getResult().getToken();
+//                        Log.d(TAG, token);
+//                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+//                        tvMitoken.setText(token);
+//                    }
+//                });
 
     }
 }

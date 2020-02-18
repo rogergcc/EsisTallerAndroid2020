@@ -37,6 +37,7 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/llTopics"
+        android:layout_marginTop="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -54,24 +55,29 @@
     </LinearLayout>
 
     <LinearLayout
+        android:padding="10dp"
         android:id="@+id/llButtons"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
         <Button
+            android:layout_weight=".5"
             android:id="@+id/btnSuscribir"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Suscribir"
             style="@style/Widget.AppCompat.Button.Colored"/>
         <Button
+            android:layout_weight=".5"
             android:id="@+id/btnDesuscribir"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Desuscribir"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
     </LinearLayout>
     <TextView
+        android:layout_marginTop="16dp"
         android:id="@+id/tvTopics"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
