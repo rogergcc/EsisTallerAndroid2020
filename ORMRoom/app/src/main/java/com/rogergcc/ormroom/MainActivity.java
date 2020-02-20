@@ -13,7 +13,7 @@ import android.view.View;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rogergcc.ormroom.adapter.AdapterContacto;
 import com.rogergcc.ormroom.model.Contacto;
-import com.rogergcc.ormroom.roomdb.AppDataBase;
+import com.rogergcc.ormroom.roomdb.ContantcsRoomDatabase;
 import com.rogergcc.ormroom.roomdb.ContactDAO;
 
 import java.util.ArrayList;
@@ -33,15 +33,19 @@ public class MainActivity extends AppCompatActivity {
     private AdapterContacto mContactRecyclerAdapter;
     private List<Contacto> misdatos;
 
-
+    private ContantcsRoomDatabase db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mContactDAO = Room.databaseBuilder(this, AppDataBase.class, "db-contacts")
+
+        mContactDAO = Room.databaseBuilder(this, ContantcsRoomDatabase.class, "db-contacts")
                 .allowMainThreadQueries() //Allows room to do operation on main thread
                 .build()
                 .getContactDAO();
+
+//        db = ContantcsRoomDatabase.getDatabase(getApplicationContext());
+//        mContactDAO = db.getContactDAO();
 
         mAddContactFloatingActionButton = findViewById(R.id.addContactFloatingActionButton);
         mAddContactFloatingActionButton.setOnClickListener(new View.OnClickListener() {

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rogergcc.ormroom.model.Contacto;
-import com.rogergcc.ormroom.roomdb.AppDataBase;
+import com.rogergcc.ormroom.roomdb.ContantcsRoomDatabase;
 import com.rogergcc.ormroom.roomdb.ContactDAO;
 
 public class UpdateContactActivity extends AppCompatActivity {
@@ -34,7 +34,7 @@ public class UpdateContactActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_contact);
-        mContactDAO = Room.databaseBuilder(this, AppDataBase.class, "db-contacts")
+        mContactDAO = Room.databaseBuilder(this, ContantcsRoomDatabase.class, "db-contacts")
                 .allowMainThreadQueries() //Allows room to do operation on main thread
                 .build()
                 .getContactDAO();

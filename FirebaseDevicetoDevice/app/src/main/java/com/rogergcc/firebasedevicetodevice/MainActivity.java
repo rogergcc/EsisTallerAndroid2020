@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -40,10 +42,15 @@ public class MainActivity extends AppCompatActivity {
     String SUBSCRIBE_TO = "userABC";
 
     TextView tv_title;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         edtTitle = findViewById(R.id.edtTitle);
         edtMessage = findViewById(R.id.edtMessage);
         tv_title = findViewById(R.id.tv_title);
@@ -56,6 +63,17 @@ public class MainActivity extends AppCompatActivity {
                 TOPIC = "/topics/userABC"; //topic has to match what the receiver subscribed to
                 NOTIFICATION_TITLE = edtTitle.getText().toString();
                 NOTIFICATION_MESSAGE = edtMessage.getText().toString();
+
+                if (TextUtils.isEmpty(NOTIFICATION_TITLE)) {
+                    Toast.makeText(MainActivity.this, "empty title", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (TextUtils.isEmpty(NOTIFICATION_MESSAGE)) {
+                    Toast.makeText(MainActivity.this, "empty message", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 JSONObject notification = new JSONObject();
                 JSONObject notifcationBody = new JSONObject();
                 try {
@@ -66,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     Log.e(TAG, "onCreate: " + e.getMessage() );
                 }
-                sendNotification(notification);
+
+//                sendNotification(notification);
 
 
 //                startActivity(new Intent(MainActivity.this,DetailsActivity.class));
@@ -108,5 +127,15 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void click_fab_nav(View view) {
+
+        startActivity(new Intent(MainActivity.this,DetailsActivity.class));
+
+    }
+
+    public void click_fab_bottom_nav(View view) {
+        startActivity(new Intent(MainActivity.this,BottomNavActivity.class));
     }
 }
