@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Contactos con Room</string>
+    <string name="app_name">Contactos RoomDB</string>
     <string name="first_name">Nombres</string>
     <string name="last_name">Apellidos</string>
     <string name="phone_number">Nro Celular</string>
@@ -9,4 +9,7 @@
     <string name="created_on">Created On</string>
     <string name="title_createcontact">Crear Contacto</string>
     <string name="Contact">Contactos</string>
+    <string name="updated">Contacto Actualizado</string>
+    <string name="saved">Contacto Registrado</string>
+    <string name="deleted">contacto Eliminado</string>
 </resources>

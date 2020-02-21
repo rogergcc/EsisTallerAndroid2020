@@ -9,4 +9,15 @@
         <item name="android:fontFamily">@font/calibri</item>
     </style>
 
+    <!-- Alert Dialog -->
+    <style name="AppTheme_DialogLight" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+
+        <!-- Used for the buttons -->
+        <item name="colorAccent">#FFC107</item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <!-- Used for the background -->
+        <item name="android:background">@color/colorDarkDialog</item>
+    </style>
+
 </resources>

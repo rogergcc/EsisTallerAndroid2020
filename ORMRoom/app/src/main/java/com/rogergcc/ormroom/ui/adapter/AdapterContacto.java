@@ -1,4 +1,4 @@
-package com.rogergcc.ormroom.adapter;
+package com.rogergcc.ormroom.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,10 +10,10 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.rogergcc.ormroom.MainActivity;
+import com.rogergcc.ormroom.ui.MainActivity;
 import com.rogergcc.ormroom.R;
-import com.rogergcc.ormroom.UpdateContactActivity;
-import com.rogergcc.ormroom.model.Contacto;
+import com.rogergcc.ormroom.ui.editcontact.EditContactActivity;
+import com.rogergcc.ormroom.entity.Contacto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,9 @@ import java.util.List;
  * Created by ROGERGCC on 18/02/2020.
  */
 public class AdapterContacto extends RecyclerView.Adapter<AdapterContacto.ViewHolder> {
-    private LayoutInflater inflador; List<Contacto> contactList; Context micontext; private int[] colors;
+
+    private LayoutInflater inflador; List<Contacto> contactList;
+    Context micontext; private int[] colors;
     public AdapterContacto(Context context, ArrayList<Contacto> contactList, int[] colors) {
         this.contactList= contactList; this.micontext=context; this.colors = colors;
         inflador = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -42,12 +44,19 @@ public class AdapterContacto extends RecyclerView.Adapter<AdapterContacto.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(micontext, UpdateContactActivity.class);
-                intent.putExtra(UpdateContactActivity.EXTRA_CONTACT_ID, contact.getPhoneNumber());
+                Intent intent = new Intent(micontext, EditContactActivity.class);
+                intent.putExtra("contact_id", contact.getId());
                 ((MainActivity)micontext).startActivityForResult(intent, 2);
             }
         });
     }
+
+
+    public void setNotes(List<Contacto> notes) {
+        contactList = notes;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() { return contactList.size(); }
     public class ViewHolder extends RecyclerView.ViewHolder {

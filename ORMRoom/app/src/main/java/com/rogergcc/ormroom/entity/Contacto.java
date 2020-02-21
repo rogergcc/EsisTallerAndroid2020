@@ -1,4 +1,6 @@
-package com.rogergcc.ormroom.model;
+package com.rogergcc.ormroom.entity;
+
+
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
@@ -12,10 +14,22 @@ import java.util.Date;
 
 @Entity(tableName = "contact")
 public class Contacto {
+
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private String firstName;
     private String lastName;
-    @PrimaryKey
-    @NonNull
+
+
     private String phoneNumber;
     private Date createdDate;
 
@@ -32,7 +46,7 @@ public class Contacto {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-    @NonNull
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -46,4 +60,13 @@ public class Contacto {
         this.createdDate = createdDate;
     }
 
+    public Contacto() {
+    }
+
+    public Contacto(String firstName, String lastName, @NonNull String phoneNumber, Date createdDate) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.createdDate = createdDate;
+    }
 }

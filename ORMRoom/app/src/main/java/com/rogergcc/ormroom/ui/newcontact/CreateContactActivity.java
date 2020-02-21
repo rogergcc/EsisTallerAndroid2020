@@ -1,16 +1,18 @@
-package com.rogergcc.ormroom;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
+package com.rogergcc.ormroom.ui.newcontact;
 
 import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.rogergcc.ormroom.model.Contacto;
-import com.rogergcc.ormroom.roomdb.ContantcsRoomDatabase;
-import com.rogergcc.ormroom.roomdb.ContactDAO;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.rogergcc.ormroom.R;
+import com.rogergcc.ormroom.data.local.db.dao.ContactDAO;
+import com.rogergcc.ormroom.entity.Contacto;
 
 import java.util.Date;
 
@@ -27,21 +29,31 @@ public class CreateContactActivity extends AppCompatActivity {
     EditText lastNameEditText;
     @BindView(R.id.phoneNumberEditText)
     EditText phoneNumberEditText;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.appbarlayout)
+    AppBarLayout appbarlayout;
+
 
     private ContactDAO mContactDAO;
+    private ContactViewModel noteViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_contact);
         ButterKnife.bind(this);
-        mContactDAO = Room.databaseBuilder(this, ContantcsRoomDatabase.class, "db-contacts")
-                .allowMainThreadQueries() //Allows room to do operation on main thread
-                .build()
-                .getContactDAO();
 
+//        mContactDAO = Room.databaseBuilder(this, ContantcsRoomDatabase.class, "db-contacts")
+//                .allowMainThreadQueries() //Allows room to do operation on main thread
+//                .build()
+//                .getContactDAO();
+        noteViewModel = ViewModelProviders.of(this).get(ContactViewModel.class);
 
     }
-    @OnClick(R.id.saveButton)
+
+
+    @OnClick(R.id.createContactFloatingActionButton)
     public void onViewClicked() {
         String firstName = firstNameEditText.getText().toString();
         String lastName = lastNameEditText.getText().toString();
@@ -55,14 +67,15 @@ public class CreateContactActivity extends AppCompatActivity {
         contact.setLastName(lastName);
         contact.setPhoneNumber(phoneNumber);
         contact.setCreatedDate(new Date());
-//Insert to database
+        //Insert to database
         try {
-            mContactDAO.insert(contact);
+            //mContactDAO.insert(contact);
+
+            noteViewModel.insert(contact);
             setResult(RESULT_OK);
             finish();
         } catch (SQLiteConstraintException e) {
             Toast.makeText(CreateContactActivity.this, "A cotnact with same phone number already exists.", Toast.LENGTH_SHORT).show();
         }
     }
-
 }

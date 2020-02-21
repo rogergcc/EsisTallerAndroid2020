@@ -1,4 +1,4 @@
-package com.rogergcc.ormroom.roomdb;
+package com.rogergcc.ormroom.data.local.db;
 
 import androidx.room.TypeConverter;
 
