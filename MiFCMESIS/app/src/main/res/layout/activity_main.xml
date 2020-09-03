@@ -25,6 +25,10 @@
             />
 
         <TextView
+
+            android:enabled="true"
+            android:textIsSelectable="true"
+            android:focusable="true"
             android:id="@+id/tv_mitoken"
             android:gravity="center"
             android:text="Mi token"

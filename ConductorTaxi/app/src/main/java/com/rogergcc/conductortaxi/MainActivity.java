@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     String miId;
 
     //region Runtime Permissions
-
+    Button btncerca;
     private void openSettingsDialog() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getSupportFragmentManager().findFragmentById(R.id.mapa);
         mapFragment.getMapAsync(this);
 
+
     }
 
     public void initSocket() {
@@ -159,12 +160,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //mSocket.on("new_connetion", nuevaconnexion);
 
+
         mSocket.connect();
 
 //        obtenerMiId();
 
 
-
+        if (mSocket.connected()){
+            btncerca = findViewById(R.id.btncerca);
+            btncerca.setEnabled(true);
+        }
 
     }
 
@@ -359,8 +364,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         dialogInterface.cancel();
                                     }
                                 });
-                        AlertDialog alert = builder.create();
-                        alert.show();
+                        //AlertDialog alert = builder.create();
+
+                        builder.create().show();
+                        //alert.show();
                     }
                 });
             } catch (JSONException e) {

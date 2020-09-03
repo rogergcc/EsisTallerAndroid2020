@@ -230,7 +230,6 @@ public class EditContactActivity extends AppCompatActivity {
         try {
             contactViewModel.update(CONTACT);
 
-
             setResult(RESULT_OK);
             finish();
         } catch (SQLiteConstraintException e) {

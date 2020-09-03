@@ -31,7 +31,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private final String ADMIN_CHANNEL_ID ="admin_channel";
     String SUBSCRIBE_TO= "userABC";
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived( RemoteMessage remoteMessage) {
         final Intent intent = new Intent(this, MainActivity.class);
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         int notificationID = new Random().nextInt(3000);

@@ -215,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String nuevoMensaje = intent.getExtras().getString("mensaje");
             mDisplay.setText(nuevoMensaje);
+            mDisplay.setText(mDisplay.getText().toString() + "\n"+ imageUrlList.get(0));
         }
     };
     static void mostrarTexto(Context contexto, String mensaje) {

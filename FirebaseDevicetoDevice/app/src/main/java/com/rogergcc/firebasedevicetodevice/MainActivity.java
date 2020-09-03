@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     EditText edtTitle;
     EditText edtMessage;
     final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    final private String serverKey = "key=" + "AAAAcbTUcQQ:APA91bEM2h9oP1N-HLYFedTYN7xx4hawsObm_ct8t9VU88BpHxipyTz9042Ngi7_WIK3X9kg-0Hy6SMh42_6xVBwAWzZBF_N6TGYVg7zdGUpxR01JSRrUzLw-xxlyOQGyiAwTGK8XkAg";
+    final private String serverKey = "key=" + "AIzaSyCsQILb0PqMu3BttyLBg3xoizFoPNKu1Xs";
     final private String contentType = "application/json";
     final String TAG = "NOTIFICATION TAG";
     String NOTIFICATION_TITLE;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "onCreate: " + e.getMessage() );
                 }
 
-//                sendNotification(notification);
+                sendNotification(notification);
 
 
 //                startActivity(new Intent(MainActivity.this,DetailsActivity.class));

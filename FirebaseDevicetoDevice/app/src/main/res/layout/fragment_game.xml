@@ -16,7 +16,7 @@
 
         android:layout_height="wrap_content"
 
-        android:text="Game"
+        android:text="@string/gaming_fragment"
         android:layout_gravity="center"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
 
