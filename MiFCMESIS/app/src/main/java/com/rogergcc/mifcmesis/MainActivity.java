@@ -14,12 +14,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
+
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashSet;
@@ -73,14 +70,19 @@ public class MainActivity extends AppCompatActivity {
 //        endregion
 
 
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
-                    @Override
-                    public void onSuccess(InstanceIdResult instanceIdResult) {
-                        Log.e("token_Id", instanceIdResult.getToken());
-                    }
-                });
 
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+                    Log.e("token_Id", token);
+
+                });
         mSharedPreferences = getPreferences(Context.MODE_PRIVATE);
         mTopicsSet = mSharedPreferences.getStringSet(SP_TOPICS, new HashSet<String>());
         showTopics();
@@ -125,20 +127,20 @@ public class MainActivity extends AppCompatActivity {
     public void onViewClicked() {
 
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(
-                new OnCompleteListener<InstanceIdResult>() {
-                    @Override public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (!task.isSuccessful()) {
-                            Log.e(TAG, "getInstanceId failed", task.getException());
-                            return;
-                        }
-                        // Get new Instance ID token
-                        String token = task.getResult().getToken();
-                        Log.d(TAG, token);
-                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
-                        tvMitoken.setText(token);
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
                     }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+                    Log.d(TAG, token);
+                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                    tvMitoken.setText(token);
                 });
+
 
     }
 }

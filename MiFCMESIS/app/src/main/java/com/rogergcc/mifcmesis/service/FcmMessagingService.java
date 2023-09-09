@@ -1,31 +1,30 @@
 package com.rogergcc.mifcmesis.service;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.rogergcc.mifcmesis.MainActivity;
-import com.rogergcc.mifcmesis.R;
+
+import java.util.Map;
 
 /**
  * Created by ROGERGCC on 17/02/2020.
  */
 public class FcmMessagingService extends FirebaseMessagingService {
 
+    private static final String TAG = "FcmMessagingService";
+
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
         sendRegistrationToServer(token);
     }
+
     private void sendRegistrationToServer(String token) {
         Log.e("newToken_ID", token);
     }
@@ -33,38 +32,64 @@ public class FcmMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        sendNotification(remoteMessage);
-    }
-    private void sendNotification(RemoteMessage remoteMessage) {
-        Intent intent = new Intent(this, MainActivity.class);
-        if(remoteMessage.getData() != null) {
-            String desc = remoteMessage.getData().get("descuento");
-            intent.putExtra("descuento", desc);
+        // Muestra una notificación directamente al usuario
+        try {
+            sendNotification(remoteMessage);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al mostrar la notificación: " + e.getMessage());
         }
+    }
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        RemoteMessage.Notification notification = remoteMessage.getNotification();
-        if (notification != null) {
-            Notification.Builder notificationBuilder = new Notification.Builder(this)
-                    .setSmallIcon(R.drawable.ic_stat_name).setContentTitle(notification.getTitle())
-                    .setContentText(notification.getBody()).setAutoCancel(true)
-                    .setSound(defaultSoundUri).setContentIntent(pendingIntent);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel("idmichanel", "Ofertachanel",
-                        NotificationManager.IMPORTANCE_DEFAULT);
-                channel.enableVibration(true);
-                if (notificationManager != null) {
-                    notificationManager.createNotificationChannel(channel);
-                }
-                notificationBuilder.setChannelId("idmichanel");
-            }
-            if (notificationManager != null) {
-                notificationManager.notify(0, notificationBuilder.build());
-            }
+
+    @Override
+    public void handleIntent(@NonNull Intent intent) {
+        super.handleIntent(intent);
+        Log.i(TAG, "handleIntent: " + intent);
+        Bundle bundleData = intent.getExtras();
+        Log.i(TAG, "handleIntent: bundleData" + bundleData);
+        RemoteMessage remoteMessage = new RemoteMessage(bundleData);
+//        if (!remoteMessage.getData().toString().isEmpty()) {
+//                sendNotification(remoteMessage);
+//        }
+
+        if (remoteMessage.getData() != null) {
+            Map<String, String> data = remoteMessage.getData();
+
+            // Extraer los detalles del pedido desde los datos del mensaje
+            String message = data.get("message");
+            String descuento = data.get("descuento");
+//            String customerName = data.get("customer_name");
+
+            // Realizar acciones adicionales, como actualizar la base de datos local
+//            try {
+//                updateLocalDatabase(message, descuento, customerName);
+//            } catch (Exception e) {
+//                Log.e(TAG, "Error al actualizar la base de datos local: " + e.getMessage());
+//            }
+        }
+    }
+
+
+    private void sendNotification(RemoteMessage remoteMessage) {
+
+//        Intent intent = new Intent(this, MainActivity.class);
+        try {
+            Map<String, String> data = remoteMessage.getData();
+            String titleData = data.get("title");
+            String messageData = data.get("message");
+            Log.i(TAG, "sendNotification: DATA getTitle " + titleData);
+
+            String notificationTitle = remoteMessage.getNotification().getTitle();
+            String notificationBody = remoteMessage.getNotification().getBody();
+            Log.i(TAG, "sendNotification: NOTIFI getTitle: " + notificationTitle);
+
+
+            // Muestra la notificación (puedes usar la clase NotificationUtils que mencionamos anteriormente).
+            NotificationUtils.showNotification(getApplicationContext(), notificationTitle, notificationBody);
+
+        } catch (Exception e) {
+            Log.e(TAG, "sendNotification: " + e.getMessage() );
+            e.printStackTrace();
         }
     }
 }
